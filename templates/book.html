@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ book.title }}</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var isbn = "{{ book.isbn }}";
+            $.ajax({
+                url: '/query',
+                type: 'GET',
+                data: { isbn: isbn },
+                success: function(data) {
+                    if(data.totalItems > 0) {
+                        var bookInfo = data.items[0].volumeInfo;
+                        var industryIdentifiers = (bookInfo.industryIdentifiers || []).reduce(function(acc, current) {
+                            acc[current.type.replace('ISBN_', '')] = current.identifier;
+                            return acc;
+                        }, {});
+                        var resultHtml = `<h2>Book Details</h2>`;
+                        resultHtml += `<p>Title: ${bookInfo.title || 'Null'}</p>`;
+                        resultHtml += `<p>Authors: ${bookInfo.authors ? bookInfo.authors.join(', ') : 'Null'}</p>`;
+                        resultHtml += `<p>Published Date: ${bookInfo.publishedDate || 'Null'}</p>`;
+                        resultHtml += `<p>ISBN-10: ${industryIdentifiers['10'] || 'Null'}</p>`;
+                        resultHtml += `<p>ISBN-13: ${industryIdentifiers['13'] || 'Null'}</p>`;
+                        resultHtml += `<p>Number of Reviews: ${bookInfo.ratingsCount || '0'}</p>`;
+                        resultHtml += `<p>Average Rating: ${bookInfo.averageRating || 'Null'}</p>`;
+                        $('#additionalBookDetails').html(resultHtml);
+                    } else {
+                        // Handle no book found in the API
+                        window.location.href = '/404.html';
+                    }
+                },
+                error: function() {
+                    $('#additionalBookDetails').html('<p>An error occurred while fetching additional book details.</p>');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="additionalBookDetails">Loading book details...</div>
+    <br>
+
+    <h2>Reviews from Other Website Users</h2>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>{{ review.rating }}/5 - {{ review.comment }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+
+    {% if review_exists %}
+        <p>You have already submitted a review for this book.</p>
+        <form action="{{ url_for('delete_review', isbn=book.isbn) }}" method="POST">
+            <button type="submit">Delete Review</button>
+        </form>
+    {% else %}
+        <br>
+        <h2>Leave a Review</h2>
+        <form action="{{ url_for('submit_review', isbn=book.isbn) }}" method="POST">
+            <label for="comment">Comment:</label><br>
+            <textarea id="comment" name="comment" rows="4" cols="50" required></textarea><br>
+            <label for="rating">Rating (1-5):</label><br>
+            <input type="number" id="rating" name="rating" min="1" max="5" required><br>
+            <button type="submit">Submit</button>
+        </form>
+    {% endif %}
+    
+    <br>
+    <a href="/">Back to Search</a>
+
+</body>
+</html>

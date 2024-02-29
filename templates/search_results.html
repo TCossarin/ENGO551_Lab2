@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    {% if results %}
+        <ul>
+            {% for book in results %}
+                <li>
+                    <a href="/book/{{ book.isbn }}">{{ book.title }}</a> by {{ book.author }} (ISBN: {{ book.isbn }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+    
+    <a href="/">Back to Search</a>
+</body>
+</html>

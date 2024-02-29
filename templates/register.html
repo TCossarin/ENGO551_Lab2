@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form action="/register" method="post">
+        Username: <input type="text" name="username"><br>
+        Password: <input type="password" name="password"><br>
+        <input type="submit" value="Register">
+    </form>
+    
+    {% set messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% set last_message = messages[-1] %}
+        <p style="color: {{ 'red' if last_message[0] == 'error' else 'green' }}">{{ last_message[1] }}</p>
+    {% endif %}
+    
+    <p>Already have an account? <a href="/login">Login here</a>.</p>
+</body>
+</html>
