@@ -17,3 +17,6 @@ login.html - Login page for existing users
 register.html - Registration for new users
 
 search_results.html - Presents results of Google Books query. Displays search results and lets user select a book. User can then view information about the book and write a review or delete it.
+
+Video:
+https://youtu.be/HNBncSnRZTM
